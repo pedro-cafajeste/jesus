@@ -1,18 +1,58 @@
 import "./styles/theme.css";
 import "./styles/global.css";
-import { MyTextList } from "./components/MyTextList";
-import { Main } from "./components/Main";
+import { ProductList } from "./components/ProductList";
 import { Header } from "./components/Header";
-import { Footer } from "./components/Footer";
-import { LuckyNumber } from "./components/etapa2/LuckyNumber";
+import { useState } from "react";
 
 export default function App() {
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false); // Novo estado para controlar a exibição
+  const [warrantyPrice, setWarrantyPrice] = useState(0);
+
+
+
+  function addToCart(product) {
+    setCart((prevCart) => {
+      const found = prevCart.find((item) => item.id === product.id);
+      if (found) {
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, qty: item.qty + 1 }
+            : item
+        );
+      }
+      return [...prevCart, { ...product, qty: 1 }];
+    });
+  }
+
+  function removeFromCart(productId) {
+    setCart((prevCart) =>
+      prevCart
+        .map((item) =>
+          item.id === productId
+            ? { ...item, qty: item.qty - 1 }
+            : item
+        )
+        .filter((item) => item.qty > 0)
+    );
+  }
+
   return (
-   <>
-      <div className="container">
-        <Header />
-        <LuckyNumber />
-      </div>
+    <>
+      <Header 
+        cart={cart} 
+        onCartClick={() => setShowCart(!showCart)} // Adiciona função para alternar a visualização
+        showCart={showCart}
+      />
+      <ProductList 
+        addToCart={addToCart} 
+        removeFromCart={removeFromCart} 
+        cart={cart}
+        showCart={showCart}
+        setShowCart={setShowCart}
+      />
+      
     </>
+    
   );
 }
